@@ -48,8 +48,9 @@ public class TrainBookingTest {
         TrainsPage trainsPage = dashboardPage.goToTrainsPage();
         SelectTravellersPage selectTravellersPage = trainsPage.searchTrainForNextFriday("Vadodara", "Surat", "First AC");
         AddTravellerInformationDialog addTravellerInformationDialog = selectTravellersPage.clickAddTraveller();
-        addTravellerInformationDialog.addTravellerInformation("Walter White", "52", "Male");
+        String personInfo = addTravellerInformationDialog.addTravellerInformation("Walter White", "52", "Male");
 
+        selectTravellersPage.verifyTravellerDetailsExists(personInfo);
         selectTravellersPage.clickPayAndBookNow();
         selectTravellersPage.printAllDetailsFromPayAndBookNowWidget();
         // add verification to verify if correct details were entered

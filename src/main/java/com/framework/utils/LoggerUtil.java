@@ -102,6 +102,15 @@ public class LoggerUtil {
         }
     }
 
+    public static void verify(boolean condition, String message) {
+        message = "[Validation] " + message;
+        if (condition) {
+            pass(message);
+        } else {
+            fail(message);
+        }
+    }
+
     // Captures and attaches a screenshot to the Allure report
     public static void attachScreenshot(String name) {
         try {

@@ -18,6 +18,21 @@ public class TrainsPage extends BasePage {
         this.waitUntilExpectedUrl("https://www.makemytrip.com/railways/");
     }
 
+    public static void formatTrainInfo(String rawInfo) {
+        String[] parts = rawInfo.split("\n");
+
+        String departureTimeDate = parts[0].trim();
+        String departureStation = parts[1].trim();
+        String travelDuration = parts[2].trim();
+        String arrivalTimeDate = parts[4].trim();  // skipping "View Route"
+        String arrivalStation = parts[5].trim();
+
+        LoggerUtil.step(String.format(
+                "Departure time and date from '%s' is '%s' and Arrival date and time at '%s' is '%s' | Estimated time '%s'",
+                departureStation, departureTimeDate, arrivalStation, arrivalTimeDate, travelDuration
+        ));
+    }
+
     public void clickBookTrainTickets() {
         this.clickElement(By.xpath("//span[contains(., \"Book Train Tickets\")]"), "Book Train Tickets checkbox");
     }
@@ -48,8 +63,6 @@ public class TrainsPage extends BasePage {
         this.typeText(By.xpath(customDropdownWidgetXpath + "//input"), location, "Location dropdown");
         this.waitForTimeout(1, "Wait for custom dropdown list to load with searched data");
         this.clickElement(By.xpath(customDropdownWidgetXpath + "//li[contains(., \"" + location + "\")]"), "Select value from list");
-//        this.clickBookTrainTickets();
-//        this.waitForElementToDisappear(By.xpath(customDropdownWidgetXpath));
     }
 
     public void fillNextFridayDate() {
@@ -95,8 +108,6 @@ public class TrainsPage extends BasePage {
         for (WebElement listingCard : allTrainsListingCardElements) {
             String trainName = listingCard.findElement(By.xpath(".//p[@data-testid=\"train-name\"]")).getText();
             String dateTimeInfo = listingCard.findElement(By.xpath(".//div[contains(@class, \"ListingCard_dateTimeInfo\")]")).getText();
-            LoggerUtil.step("--------------------------------------------------------------------------------------------------------------");
-            LoggerUtil.step("Train details: Train Name=" + trainName + " | Date Time Info=" + dateTimeInfo);
 
             List<WebElement> seatInfoElements = listingCard.findElements(By.xpath(".//div[@data-testid=\"card-wrapper\" and contains(., \"Available\")]"));
 
@@ -105,13 +116,17 @@ public class TrainsPage extends BasePage {
                 elementToClick = seatInfoElements.get(0);
             }
 
-            for (WebElement seatInfoElement : seatInfoElements) {
-                String classInfo = seatInfoElement.findElement(By.xpath(".//p[@data-testid=\"class-info\"]")).getText();
-                String availabilityDetails = seatInfoElement.findElement(By.xpath(".//p[@data-testid=\"availability-text\"]")).getText();
-                String priceDetails = seatInfoElement.findElement(By.xpath(".//p[contains(@class, \"Cards_totalText\")]")).getText();
-                LoggerUtil.step("-----------------");
-                LoggerUtil.step("classInfo=" + classInfo + " | AvailabilityDetails=" + availabilityDetails + " | PriceDetails=" + priceDetails);
-            }
+            Allure.step("Train Name: " + trainName, () -> {
+                formatTrainInfo(dateTimeInfo);
+
+                for (WebElement seatInfoElement : seatInfoElements) {
+                    String classInfo = seatInfoElement.findElement(By.xpath(".//p[@data-testid=\"class-info\"]")).getText();
+                    String availabilityDetails = seatInfoElement.findElement(By.xpath(".//p[@data-testid=\"availability-text\"]")).getText();
+                    String priceDetails = seatInfoElement.findElement(By.xpath(".//p[contains(@class, \"Cards_totalText\")]")).getText();
+                    String priceOnly = priceDetails.replaceAll("\\D", "");
+                    LoggerUtil.verify(Integer.parseInt(priceOnly) > 0, "For travel class = " + classInfo + " Price shall be non-zero | current ticket price = " + priceDetails + " | " + availabilityDetails);
+                }
+            });
         }
         return elementToClick;
     }

@@ -13,6 +13,12 @@ public class AddTravellerInformationDialog extends BasePage {
         this.waitUntilVisible(By.xpath(widgetXpath), "Add Traveller Information Dialog Widget");
     }
 
+    public static String formatPersonInfo(String name, String age, String gender) {
+        String genderShort = gender.equalsIgnoreCase("Male") ? "M" :
+                gender.equalsIgnoreCase("Female") ? "F" : "?";
+        return String.format("%s {%s}, %s", name, genderShort, age);
+    }
+
     public void fillName(String name) {
         this.typeText(By.xpath(widgetXpath + "//input[@id=\"name\"]"), name, "Enter name");
     }
@@ -31,12 +37,15 @@ public class AddTravellerInformationDialog extends BasePage {
         this.clickElement(By.xpath(widgetXpath + "//button[contains(., \"Add\")]"), "Add button");
     }
 
-    public void addTravellerInformation(String name, String age, String gender) {
+    public String addTravellerInformation(String name, String age, String gender) {
         Allure.step("Add new traveller with name = " + name + " age = " + age + " gender = " + gender, () -> {
             this.fillName(name);
             this.fillAge(age);
             this.selectGender(gender);
             this.clickAddButton();
         });
+
+        return formatPersonInfo(name, age, gender);
     }
+
 }

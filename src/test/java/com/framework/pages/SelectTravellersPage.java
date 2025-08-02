@@ -5,6 +5,9 @@ import com.framework.utils.LoggerUtil;
 import io.qameta.allure.Allure;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 public class SelectTravellersPage extends BasePage {
     private final String widgetXpath = "//div[@class=\"railTravellersWrapper\"]";
@@ -36,6 +39,22 @@ public class SelectTravellersPage extends BasePage {
         Allure.step(log, () -> {
             String details = this.getElementText(By.xpath(payAndBookNowWraper + "//div[@class=\"paymentDetailsWrapper\"]"), "payment Details Wrapper");
             Allure.step("Details are: " + details);
+        });
+    }
+
+    public void verifyTravellerDetailsExists(String personInfo) {
+        Allure.step("Verify Traveller details are added successfully " + personInfo, () -> {
+            List<WebElement> allTravellerDetailsElements = this.getElements(By.xpath("//ul[@id=\"travellersData\"]//li"));
+
+            for (WebElement element : allTravellerDetailsElements) {
+                String travellerDetails = element.getText();
+
+                if (travellerDetails.contains(personInfo)) {
+                    LoggerUtil.pass("Traveler details " + personInfo + " found in list");
+                    return;
+                }
+            }
+            LoggerUtil.fail("Traveler details not found in list | " + personInfo);
         });
     }
 
