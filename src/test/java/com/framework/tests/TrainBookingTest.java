@@ -53,9 +53,6 @@ public class TrainBookingTest {
         selectTravellersPage.verifyTravellerDetailsExists(personInfo);
         selectTravellersPage.clickPayAndBookNow();
         selectTravellersPage.printAllDetailsFromPayAndBookNowWidget();
-        // add verification to verify if correct details were entered
-
-//        LoggerUtil.compare(0, 1, "comparison of 0 and 1");
     }
 
     @AfterClass

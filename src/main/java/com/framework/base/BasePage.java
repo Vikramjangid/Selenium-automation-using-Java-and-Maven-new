@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 public abstract class BasePage {
-    private final int DEFAULT_TIMEOUT = 20;
+    private static final int DEFAULT_TIMEOUT = 20;
     protected WebDriver driver;
     protected WebDriverWait wait;
 
