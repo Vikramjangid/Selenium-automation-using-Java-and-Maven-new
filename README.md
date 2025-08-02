@@ -91,3 +91,20 @@ This repository contains a robust Selenium automation framework built using Java
 - Ensure all dependencies are installed and up to date (`mvn clean install`)
 - If Allure report does not open, check that Allure is installed and in your PATH
 - For browser issues, check the browser driver version and update WebDriverManager if needed
+
+## Potential Improvements
+
+If more time were available, the following improvements could be made to further enhance the framework:
+
+- **Cross-browser and cross-platform testing:** Integrate with Selenium Grid or cloud services (e.g., BrowserStack, Sauce Labs) to run tests across multiple browsers and operating systems in parallel.
+- **CI/CD Integration:** Set up automated test execution in a CI/CD pipeline (e.g., GitHub Actions, Jenkins) for continuous feedback and reporting.
+- **Advanced reporting:** Customize Allure reports further, add trend analysis, and integrate with test management tools.
+- **Data-driven testing:** Implement data providers or externalize test data (CSV, Excel, JSON) for broader test coverage and easier maintenance.
+- **API testing integration:** Add REST API test support (e.g., using RestAssured) for end-to-end and backend validation.
+- **Enhanced error handling:** Improve exception management, add retry logic for flaky tests, and implement better failure diagnostics (e.g., browser logs, video recording).
+- **Test coverage and quality:** Add static analysis, code coverage tools, and enforce code quality standards.
+- **Reusable components:** Refactor and modularize utilities for even greater reusability and maintainability.
+- **Page object enhancements:** Adopt the Page Factory pattern more extensively or explore newer design patterns (e.g., Screenplay).
+- **Accessibility and performance testing:** Integrate tools for accessibility checks and basic performance metrics.
+
+These enhancements would make the framework more robust, scalable, and suitable for enterprise-level automation needs.
