@@ -1,7 +1,10 @@
 package com.framework.tests;
 
 import com.framework.base.DriverFactory;
+import com.framework.pages.AddTravellerInformationDialog;
 import com.framework.pages.DashboardPage;
+import com.framework.pages.SelectTravellersPage;
+import com.framework.pages.TrainsPage;
 import com.framework.utils.ConfigReader;
 import com.framework.utils.LoggerUtil;
 import io.qameta.allure.*;
@@ -42,6 +45,14 @@ public class TrainBookingTest {
         String actualTitle = dashboardPage.getPageTitle();
 
         LoggerUtil.compare(actualTitle, expectedTitle, "Verify Page title");
+        TrainsPage trainsPage = dashboardPage.goToTrainsPage();
+        SelectTravellersPage selectTravellersPage = trainsPage.searchTrainForNextFriday("Vadodara", "Surat", "First AC");
+        AddTravellerInformationDialog addTravellerInformationDialog = selectTravellersPage.clickAddTraveller();
+        addTravellerInformationDialog.addTravellerInformation("Walter White", "52", "Male");
+
+        selectTravellersPage.clickPayAndBookNow();
+        selectTravellersPage.printAllDetailsFromPayAndBookNowWidget();
+        // add verification to verify if correct details were entered
 
 //        LoggerUtil.compare(0, 1, "comparison of 0 and 1");
     }

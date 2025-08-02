@@ -17,4 +17,9 @@ public class DashboardPage extends BasePage {
     public void navigateTo(String menuItemName) {
         clickElement(By.xpath(navigationBarXpath + "//ul//li[@data-cy=\"menu_" + menuItemName + "\"]"), "Navigation menu button for " + menuItemName);
     }
+
+    public TrainsPage goToTrainsPage() {
+        this.navigateTo("Trains");
+        return new TrainsPage(this.driver);
+    }
 }
