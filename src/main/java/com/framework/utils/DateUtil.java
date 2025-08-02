@@ -7,13 +7,13 @@ public class DateUtil {
 
     // Returns the LocalDate of the next Friday from today
     public static LocalDate getNextFriday() {
-        LocalDate today = LocalDate.now();
-        int daysUntilFriday = DayOfWeek.FRIDAY.getValue() - today.getDayOfWeek().getValue();
+        LocalDate currentDate = LocalDate.now();
+        int daysUntilFriday = DayOfWeek.FRIDAY.getValue() - currentDate.getDayOfWeek().getValue();
         if (daysUntilFriday <= 0) {
             // If today is Friday or after, move to next week's Friday
             daysUntilFriday += 7;
         }
-        return today.plusDays(daysUntilFriday);
+        return currentDate.plusDays(daysUntilFriday);
     }
 
 }
