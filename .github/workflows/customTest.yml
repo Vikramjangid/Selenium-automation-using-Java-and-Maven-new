@@ -1,0 +1,68 @@
+name: Custom date - Run Tests with Allure Reporting
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Enter any Date from current and next month for the test (format: YYYY-MM-DD)'
+        required: true
+        default: '2025-09-09'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: '3.9.4'
+
+      - name: Install Chrome 124
+        run: |
+          sudo apt-get remove google-chrome-stable -y || true
+          wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/124.0.6367.91/linux64/chrome-linux64.zip
+          unzip chrome-linux64.zip
+          sudo mv chrome-linux64 /opt/chrome124
+          sudo ln -sf /opt/chrome124/chrome /usr/bin/google-chrome
+          google-chrome --version
+
+      - name: Install Xvfb (for headed mode)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          echo "Starting Xvfb on :99"
+          Xvfb :99 -ac > /dev/null 2>&1 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+
+      - name: Run Tests with Maven (headed mode using Xvfb)
+        env:
+          DISPLAY: :99
+        run: |
+          mvn clean test -Ddate="${{ github.event.inputs.date }}"
+
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results/
+
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+
+# Use `allure generate allure-results --clean -o allure-report` command to generate report from the uploaded artifacts
+# Use `allure open allure-report` command to open the generated report

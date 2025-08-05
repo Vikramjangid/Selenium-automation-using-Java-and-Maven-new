@@ -13,7 +13,7 @@ public class DateUtil {
             // If today is Friday or after, move to next week's Friday
             daysUntilFriday += 7;
         }
-        return currentDate.plusDays(daysUntilFriday);
+        return currentDate.plusDays(daysUntilFriday + 7);
     }
 
 }

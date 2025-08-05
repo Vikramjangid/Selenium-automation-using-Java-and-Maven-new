@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -72,30 +73,67 @@ public class TrainsPage extends BasePage {
         });
     }
 
+    public void fillDate(LocalDate inputDate) {
+        Allure.step("Select next friday date from calender widget", () -> {
+            this.clickElement(By.xpath("//label[@for=\"travelDate\"]"), "Travel Date label to activate calendar");
+            this.selectDateFromCustomPicker(inputDate);
+        });
+    }
+
     public void clickSearchButton() {
         this.clickElement(By.xpath("//a[@data-cy=\"submit\" and contains(., \"Search\")]"), "Search button");
     }
 
-    public SelectTravellersPage searchTrainForNextFriday(String from, String to, String travelClass) {
+    public void applyDepartureFilter(String from, String filter) {
+        Allure.step("Apply filter: Departure from " + from + " filter option " + filter, () -> {
+            this.clickElement(By.xpath("//div[contains(@class, \"FilterCard_filterCardSection\") and contains(., \"Departure from " + from + "\")]//li[@data-testid=\"filter-option-" + filter + "\"]"), "Departure from " + from + " filter option " + filter);
+            this.waitForTimeout(2, "Wait for data to be filtered");
+        });
+    }
+
+    public void applyFilterForTravelClass() {
+        String travelClass = this.getElementValue(By.xpath("//input[@id=\"travelFor\"]"), "Travel for class value input field");
+        String[] parts = travelClass.split(",", 2); // Limit to 2 parts
+        String input = parts.length > 1 ? parts[1].trim() : "";
+        String log = "Apply filter for travel class:" + input;
+
+        Allure.step(log, () -> {
+            this.clickElement(By.xpath("//div[contains(@class, \"FilterCard\") and contains(., \"Journey Class Filters\")]//li[contains(., \"" + input + "\")]"), log);
+            this.waitForTimeout(2, "Wait for data to be filtered");
+        });
+    }
+
+    public SelectTravellersPage searchTrainForNextFriday(String from, String to, String travelClass, LocalDate inputDate) {
         AtomicReference<WebElement> elementToClick = new AtomicReference<>();
         Allure.step("Search train for next Friday with destination: " + to + " from source: " + from + " With travel class:" + travelClass, () -> {
             this.fillFromCity(from);
             this.fillTravelClass(travelClass);
             this.fillToCity(to);
-            this.fillNextFridayDate();
+            this.fillDate(inputDate);
+            // disabled below line to enable custom date input using config
+            // this.fillNextFridayDate();
             this.clickSearchButton();
 
-            this.clickElement(By.xpath("//div[contains(@class, \"FilterCard_filterCardSection\") and contains(., \"Departure from " + from + "\")]//li[@data-testid=\"filter-option-6pm - 12am\"]"), "Departure from " + from + " filter-option-6pm - 12am");
-            this.waitForTimeout(1, "Wait for data to be filtered");
+            this.applyDepartureFilter(from, "6pm - 12am");
+            this.applyFilterForTravelClass();
 
             Allure.step("Fetch all available train details", () -> {
                 elementToClick.set(this.getAvailableTrainDetails());
             });
         });
 
+        if (elementToClick.get() == null) {
+            LoggerUtil.error("No seats are available on date with specified conditions. Please select a different date");
+        }
         Allure.step("Click on first train after 6 PM", () -> {
             elementToClick.get().click();
         });
+
+        ConfirmedOptionsDialog confirmedOptionsDialog = new ConfirmedOptionsDialog(this.driver);
+        if (confirmedOptionsDialog.checkIfConfirmedOptionsDialogExists()) {
+            confirmedOptionsDialog.clickBookNowButton();
+        }
+
         return new SelectTravellersPage(this.driver);
     }
 
@@ -111,7 +149,7 @@ public class TrainsPage extends BasePage {
 
             List<WebElement> seatInfoElements = listingCard.findElements(By.xpath(".//div[@data-testid=\"card-wrapper\" and contains(., \"Available\")]"));
 
-            if (elementToClick == null) {
+            if (elementToClick == null && !seatInfoElements.isEmpty()) {
                 // set element to click on first train after 6 PM
                 elementToClick = seatInfoElements.get(0);
             }
