@@ -91,6 +91,12 @@ public abstract class BasePage {
         return element.getText();
     }
 
+    public String getElementValue(By locator, String description) {
+        LoggerUtil.step("Getting value from: " + description);
+        WebElement element = getElement(locator, description);
+        return element.getAttribute("value");
+    }
+
     // Selects an option in a dropdown by visible text
     public void selectByVisibleText(By locator, String visibleText, String description) {
         LoggerUtil.step("Selecting from dropdown by visible text: " + visibleText + " on " + description);
@@ -114,9 +120,11 @@ public abstract class BasePage {
 
     // Checks if the element is visible on the page
     public boolean isElementVisible(By locator, String description) {
+        this.waitForTimeout(1, "Default wait before checking if element exists to implement delayed wait.");
+
         LoggerUtil.debug("Checking visibility of: " + description);
         try {
-            return getElement(locator, description).isDisplayed();
+            return driver.findElement(locator).isDisplayed();
         } catch (NoSuchElementException | TimeoutException e) {
             LoggerUtil.debug("Element not visible: " + description);
             return false;

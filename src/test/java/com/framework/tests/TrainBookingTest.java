@@ -14,6 +14,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.time.LocalDate;
+
 @Epic("MakeMyTrip Booking")
 @Feature("Train Booking")
 @Listeners({io.qameta.allure.testng.AllureTestNg.class})
@@ -46,7 +48,8 @@ public class TrainBookingTest {
 
         LoggerUtil.compare(actualTitle, expectedTitle, "Verify Page title");
         TrainsPage trainsPage = dashboardPage.goToTrainsPage();
-        SelectTravellersPage selectTravellersPage = trainsPage.searchTrainForNextFriday("Vadodara", "Surat", "First AC");
+        String inputDate = ConfigReader.getProperty("date");
+        SelectTravellersPage selectTravellersPage = trainsPage.searchTrainForNextFriday("Vadodara", "Surat", "First AC", LocalDate.parse(inputDate));
         AddTravellerInformationDialog addTravellerInformationDialog = selectTravellersPage.clickAddTraveller();
         String personInfo = addTravellerInformationDialog.addTravellerInformation("Walter White", "52", "Male");
 
